@@ -10,6 +10,7 @@ import {
 } from '@angular/router';
 import {
   BlockingDemo,
+  ErrorDemo,
   HomePage,
   NotFoundPage,
   NonBlockingDemo,
@@ -63,6 +64,17 @@ const resourceRoutes: ResourceRoute[] = [
         resource({
           params: () => ctx.queryParams()['filter'] ?? 'all',
           loader: ({ params, abortSignal }) => loadReport(params, abortSignal),
+        }),
+      ),
+    }),
+  },
+  {
+    path: 'error',
+    component: ErrorDemo,
+    resources: () => ({
+      failure: nonBlocking(
+        resource({
+          loader: ({ abortSignal }) => loadReport('error', abortSignal),
         }),
       ),
     }),

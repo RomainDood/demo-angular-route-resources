@@ -13,7 +13,7 @@ import {
       <p class="eyebrow">Angular Router · preview</p>
       <h1>Les ressources suivent enfin les routes.</h1>
       <p class="hero-copy">
-        Quatre mini-expériences pour montrer comment <code>resources</code>
+        Cinq mini-expériences pour montrer comment <code>resources</code>
         connecte navigation, signals et chargement de données.
       </p>
     </section>
@@ -41,6 +41,12 @@ import {
         <span class="card-index">04</span>
         <h2>Chargements parallèles</h2>
         <p>Deux ressources d’une même route partent ensemble, sans waterfall.</p>
+        <span class="card-link">Ouvrir la démo <span>→</span></span>
+      </a>
+      <a class="demo-card" routerLink="/error">
+        <span class="card-index">05</span>
+        <h2>Erreur de chargement</h2>
+        <p>Le loading se termine par une erreur visible dans le composant.</p>
         <span class="card-link">Ouvrir la démo <span>→</span></span>
       </a>
     </section>
@@ -156,6 +162,50 @@ export class BlockingDemo {
 })
 export class NonBlockingDemo {
   readonly report = input.required<Resource<DemoReport>>();
+}
+
+@Component({
+  template: `
+    <a class="back-link" routerLink="/">← Toutes les démos</a>
+    <section class="demo-heading">
+      <div>
+        <p class="eyebrow">05 · Erreur de chargement</p>
+        <h1>Quand le loading échoue.</h1>
+        <p>La ressource démarre en loading, puis expose son erreur sans casser la route.</p>
+      </div>
+      <span class="status-pill status-pill--orange">Erreur prévue</span>
+    </section>
+
+    <article class="result-panel report-panel error-demo-panel">
+      @if (failure().isLoading()) {
+        <div class="loading-state">
+          <span class="loader"></span>
+          <div>
+            <strong>Chargement du rapport…</strong>
+            <p>Observez cet état pendant environ 1,8 seconde.</p>
+          </div>
+        </div>
+      } @else if (failure().error(); as error) {
+        <div class="error-state">
+          <span class="error-icon">!</span>
+          <div>
+            <strong>Le chargement a échoué.</strong>
+            <p>{{ error.message }}</p>
+            <span class="error-code">Resource status: error</span>
+          </div>
+        </div>
+      }
+    </article>
+
+    <div class="explanation">
+      <code>failure().isLoading() → failure().error()</code>
+      <span>Avec <code>nonBlocking()</code>, l’erreur est disponible comme signal.</span>
+    </div>
+  `,
+  imports: [RouterLink],
+})
+export class ErrorDemo {
+  readonly failure = input.required<Resource<DemoReport>>();
 }
 
 @Component({

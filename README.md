@@ -8,6 +8,7 @@ Une application Angular minimale pour présenter l’association de ressources r
 - une ressource `nonBlocking()` avec affichage de `loading`, `value` et `error` ;
 - un `resource.reload()` sans renavigation ;
 - deux ressources bloquantes exécutées en parallèle ;
+- un cas d’erreur dédié où la ressource passe de `loading` à `error` ;
 - une redirection avec `RedirectCommand` quand la ressource est absente.
 
 La démo utilise des données simulées en mémoire et des délais artificiels pour rendre chaque comportement visible.

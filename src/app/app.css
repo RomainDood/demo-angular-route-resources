@@ -368,6 +368,14 @@ footer a:hover,
   width: 28px;
 }
 
+.error-code {
+  color: #b34634;
+  display: inline-block;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 11px;
+  margin-top: 14px;
+}
+
 .report-header {
   align-items: start;
   display: flex;
