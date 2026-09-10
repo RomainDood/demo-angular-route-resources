@@ -1,4 +1,11 @@
-import { Component, inject, input, Resource } from '@angular/core';
+import {
+  Component,
+  inject,
+  input,
+  resource,
+  Resource,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
 import {
   DemoItem,
@@ -6,6 +13,7 @@ import {
   DemoReport,
   ParallelResult,
 } from './demo-data';
+import { wait } from './demo-data';
 
 @Component({
   template: `
@@ -13,7 +21,7 @@ import {
       <p class="eyebrow">Angular Router · preview</p>
       <h1>Les ressources suivent enfin les routes.</h1>
       <p class="hero-copy">
-        Cinq mini-expériences pour montrer comment <code>resources</code>
+        Six mini-expériences pour montrer comment <code>resources</code>
         connecte navigation, signals et chargement de données.
       </p>
     </section>
@@ -48,6 +56,12 @@ import {
         <h2>Erreur de chargement</h2>
         <p>Le loading se termine par une erreur visible dans le composant.</p>
         <span class="card-link">Ouvrir la démo <span>→</span></span>
+      </a>
+      <a class="demo-card" routerLink="/resources">
+        <span class="card-index">06</span>
+        <h2>Comprendre une ressource</h2>
+        <p>Un aperçu simple de value, status, set(), reload() et error().</p>
+        <span class="card-link">Ouvrir la page <span>→</span></span>
       </a>
     </section>
 
@@ -289,6 +303,159 @@ export class ReloadDemo {
 export class ParallelDemo {
   readonly summary = input.required<ParallelResult>();
   readonly activity = input.required<ParallelResult>();
+}
+
+interface PlaygroundValue {
+  loadedAt: string;
+  source: 'loader' | 'set';
+  value: number;
+}
+
+@Component({
+  template: `
+    <a class="back-link" routerLink="/">← Toutes les démos</a>
+    <section class="demo-heading">
+      <div>
+        <p class="eyebrow">Guide · Angular Resource</p>
+        <h1>Une ressource, c’est quoi ?</h1>
+        <p>Un objet réactif qui encapsule une lecture asynchrone, sa valeur et tous ses états.</p>
+      </div>
+      <span class="status-pill status-pill--blue">Concepts clés</span>
+    </section>
+
+    <section class="resource-overview" aria-label="Anatomie d’une ressource">
+      <article class="resource-method-card">
+        <span class="kicker">Lire</span>
+        <code>resource.value()</code>
+        <p>La dernière valeur connue, exposée comme un signal.</p>
+      </article>
+      <article class="resource-method-card">
+        <span class="kicker">Observer</span>
+        <code>resource.status()</code>
+        <p><code>loading</code>, <code>reloading</code>, <code>resolved</code>, <code>error</code> ou <code>local</code>.</p>
+      </article>
+      <article class="resource-method-card">
+        <span class="kicker">Contrôler</span>
+        <code>resource.reload()</code>
+        <p>Relance le loader sans recréer le composant.</p>
+      </article>
+      <article class="resource-method-card">
+        <span class="kicker">Éditer localement</span>
+        <code>resource.set(value)</code>
+        <p>Remplace temporairement la valeur et passe l’état à <code>local</code>.</p>
+      </article>
+    </section>
+
+    <section class="resource-layout">
+      <article class="result-panel report-panel resource-playground">
+        <div class="resource-playground__header">
+          <div>
+            <span class="kicker">Laboratoire interactif</span>
+            <h2>Manipulez une ressource en direct</h2>
+          </div>
+          <span class="status-pill status-pill--purple">{{ playground.status() }}</span>
+        </div>
+
+        @if (playground.isLoading()) {
+          <div class="loading-state">
+            <span class="loader"></span>
+            <div>
+              <strong>Le loader travaille…</strong>
+              <p>La ressource est dans un état <code>loading</code> ou <code>reloading</code>.</p>
+            </div>
+          </div>
+        } @else if (playground.error(); as error) {
+          <div class="error-state">
+            <span class="error-icon">!</span>
+            <div>
+              <strong>Le loader a retourné une erreur.</strong>
+              <p>{{ error.message }}</p>
+            </div>
+          </div>
+        } @else if (playground.hasValue()) {
+          <div class="resource-value">
+            <span class="kicker">Valeur courante</span>
+            <strong>{{ playground.value().value }}</strong>
+            <span>source : <code>{{ playground.value().source }}</code> · {{ playground.value().loadedAt }}</span>
+          </div>
+        }
+
+        <div class="resource-actions">
+          <button type="button" (click)="setLocalValue()">set()</button>
+          <button type="button" (click)="reloadResource()">reload()</button>
+          <button class="button--danger" type="button" (click)="simulateError()">Provoquer une erreur</button>
+          <button class="button--quiet" type="button" (click)="recover()">Réinitialiser</button>
+        </div>
+      </article>
+
+      <div class="resource-code">
+        <span class="kicker">La forme minimale</span>
+        <pre><code>const user = resource(&#123;
+  params: () =&gt; userId(),
+  loader: (&#123; params &#125;) =&gt; fetchUser(params),
+&#125;);
+
+user.value();
+user.isLoading();
+user.error();
+user.reload();</code></pre>
+      </div>
+    </section>
+
+    <div class="explanation">
+      <code>resource()</code>
+      <span>Une ressource transforme une promesse en état réactif consommable par le template.</span>
+    </div>
+  `,
+  imports: [RouterLink],
+})
+export class ResourcesGuide {
+  private readonly shouldFail = signal(false);
+  private requestNumber = 0;
+
+  readonly playground = resource<PlaygroundValue, boolean>({
+    defaultValue: {
+      loadedAt: 'valeur par défaut',
+      source: 'loader',
+      value: 42,
+    },
+    params: () => this.shouldFail(),
+    loader: async ({ params, abortSignal }) => {
+      await wait(1200, abortSignal);
+
+      if (params) {
+        throw new Error('Le loader a rencontré un problème réseau.');
+      }
+
+      this.requestNumber += 1;
+      return {
+        loadedAt: `requête #${this.requestNumber}`,
+        source: 'loader' as const,
+        value: 42 + this.requestNumber,
+      };
+    },
+  });
+
+  setLocalValue(): void {
+    this.playground.set({
+      loadedAt: 'à l’instant',
+      source: 'set',
+      value: 99,
+    });
+  }
+
+  reloadResource(): void {
+    this.playground.reload();
+  }
+
+  simulateError(): void {
+    this.shouldFail.set(true);
+  }
+
+  recover(): void {
+    this.shouldFail.set(false);
+    this.playground.reload();
+  }
 }
 
 @Component({

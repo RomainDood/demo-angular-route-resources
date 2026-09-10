@@ -491,6 +491,132 @@ button span {
   gap: 5px;
 }
 
+.resource-overview {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 34px;
+}
+
+.resource-method-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  min-height: 160px;
+  padding: 20px;
+}
+
+.resource-method-card code {
+  display: inline-block;
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+.resource-method-card p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  margin-bottom: 0;
+}
+
+.resource-layout {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1.25fr 0.75fr;
+  margin-top: 16px;
+}
+
+.resource-playground {
+  margin-top: 0;
+}
+
+.resource-playground__header {
+  align-items: start;
+  display: flex;
+  justify-content: space-between;
+}
+
+.resource-playground__header h2 {
+  margin-bottom: 0;
+}
+
+.resource-value {
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 26px;
+  padding-top: 26px;
+}
+
+.resource-value strong {
+  font-size: 58px;
+  letter-spacing: -0.08em;
+  line-height: 1;
+}
+
+.resource-value > span:last-child {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.resource-actions {
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 28px;
+  padding-top: 20px;
+}
+
+.resource-actions button {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 12px;
+}
+
+.resource-actions .button--danger {
+  background: #f8e5e1;
+  color: #a33f2e;
+}
+
+.resource-actions .button--danger:hover {
+  background: #efcfc8;
+}
+
+.resource-actions .button--quiet {
+  background: #eceae3;
+  color: var(--muted);
+}
+
+.resource-actions .button--quiet:hover {
+  background: #dfddd5;
+  color: var(--ink);
+}
+
+.resource-code {
+  background: var(--ink);
+  border-radius: 18px;
+  color: #e9e8dd;
+  padding: 28px;
+}
+
+.resource-code .kicker {
+  color: #c99470;
+}
+
+.resource-code pre {
+  margin: 12px 0 0;
+  overflow-x: auto;
+}
+
+.resource-code pre code {
+  background: none;
+  color: #e9e8dd;
+  font-size: 12px;
+  line-height: 1.7;
+  padding: 0;
+}
+
 .not-found {
   margin: 80px auto;
   max-width: 560px;
@@ -546,7 +672,9 @@ footer a {
   }
 
   .demo-grid,
-  .parallel-grid {
+  .parallel-grid,
+  .resource-overview,
+  .resource-layout {
     grid-template-columns: 1fr;
   }
 

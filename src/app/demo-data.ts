@@ -41,7 +41,7 @@ const items: Record<string, DemoItem> = {
 
 let requestNumber = 0;
 
-function wait(delay: number, abortSignal?: AbortSignal): Promise<void> {
+export function wait(delay: number, abortSignal?: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
     const timer = window.setTimeout(resolve, delay);
     const abort = () => {

@@ -16,6 +16,7 @@ import {
   NonBlockingDemo,
   ParallelDemo,
   ReloadDemo,
+  ResourcesGuide,
 } from './demo-pages';
 import {
   loadActivity,
@@ -105,6 +106,10 @@ const resourceRoutes: ResourceRoute[] = [
         }),
       };
     },
+  },
+  {
+    path: 'resources',
+    component: ResourcesGuide,
   },
   {
     path: 'not-found',
