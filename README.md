@@ -44,5 +44,5 @@ pnpm build
 
 ## Liens
 
-- GitHub : à compléter après publication
-- StackBlitz : à compléter après publication
+- GitHub : https://github.com/RomainDood/demo-angular-route-resources
+- StackBlitz : https://stackblitz.com/github/RomainDood/demo-angular-route-resources
