@@ -6,11 +6,18 @@ import {
   Resource,
   signal,
 } from '@angular/core';
-import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
+import {
+  ActivatedRoute,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+} from '@angular/router';
 import {
   DemoItem,
   DemoMetrics,
   DemoReport,
+  NestedProject,
+  NestedTask,
   ParallelResult,
 } from './demo-data';
 import { wait } from './demo-data';
@@ -21,7 +28,7 @@ import { wait } from './demo-data';
       <p class="eyebrow">Angular Router · preview</p>
       <h1>Les ressources suivent enfin les routes.</h1>
       <p class="hero-copy">
-        Six mini-expériences pour montrer comment <code>resources</code>
+        Sept mini-expériences pour montrer comment <code>resources</code>
         connecte navigation, signals et chargement de données.
       </p>
     </section>
@@ -62,6 +69,12 @@ import { wait } from './demo-data';
         <h2>Comprendre une ressource</h2>
         <p>Un aperçu simple de value, status, set(), reload() et error().</p>
         <span class="card-link">Ouvrir la page <span>→</span></span>
+      </a>
+      <a class="demo-card" routerLink="/project/dashboard/task/42">
+        <span class="card-index">07</span>
+        <h2>Hiérarchie sans waterfall</h2>
+        <p>Projet parent et tâche enfant démarrent leurs ressources ensemble.</p>
+        <span class="card-link">Ouvrir la démo <span>→</span></span>
       </a>
     </section>
 
@@ -456,6 +469,84 @@ export class ResourcesGuide {
     this.shouldFail.set(false);
     this.playground.reload();
   }
+}
+
+@Component({
+  template: `
+    <a class="back-link" routerLink="/">← Toutes les démos</a>
+    <section class="demo-heading">
+      <div>
+        <p class="eyebrow">07 · Parent + enfant</p>
+        <h1>Éviter le waterfall dans une page imbriquée.</h1>
+        <p>Le projet et la tâche sont chargés par deux niveaux de routes différents, mais leurs ressources démarrent ensemble.</p>
+      </div>
+      <span class="status-pill status-pill--orange">≈ 3 secondes</span>
+    </section>
+
+    <article class="result-panel nested-project-panel">
+      <div class="product-mark">P</div>
+      <div class="nested-project-copy">
+        <span class="kicker">Route parente · /project/:projectId</span>
+        <h2>{{ project().name }}</h2>
+        <p>{{ project().description }} La ressource est prête après {{ project().elapsed }} ms.</p>
+        <nav class="nested-task-links" aria-label="Changer de tâche">
+          <a routerLink="./task/42" routerLinkActive="nested-task-link--active">Tâche 42</a>
+          <a routerLink="./task/99" routerLinkActive="nested-task-link--active">Tâche 99</a>
+        </nav>
+      </div>
+    </article>
+
+    <div class="route-chain">
+      <code>/project/:projectId</code>
+      <span>→</span>
+      <code>/task/:taskId</code>
+      <span class="route-chain__hint">deux ressources indépendantes</span>
+    </div>
+
+    <router-outlet />
+
+    <div class="parallel-callout">
+      <strong>Pourquoi environ 3 s et pas 5 s ?</strong>
+      <span>Le projet prend 2 s, la tâche 3 s, et les deux loaders partagent le même départ. Si la tâche dépendait du projet, cette optimisation ne serait naturellement plus possible.</span>
+    </div>
+  `,
+  imports: [RouterLink, RouterLinkActive, RouterOutlet],
+})
+export class ProjectDetailDemo {
+  readonly project = input.required<NestedProject>();
+}
+
+@Component({
+  template: `
+    <article class="result-panel report-panel task-panel">
+      <div class="task-header">
+        <div>
+          <span class="kicker">Route enfant · /task/:taskId</span>
+          <h2>{{ task().title }}</h2>
+        </div>
+        <span class="status-pill status-pill--green">{{ task().status }}</span>
+      </div>
+
+      <div class="nested-timeline" aria-label="Chronologie des ressources">
+        <div class="timeline-row">
+          <span>Projet · 2 s</span>
+          <div class="timeline-track"><span class="timeline-track__project"></span></div>
+          <strong>{{ task().elapsed - 1000 }} ms</strong>
+        </div>
+        <div class="timeline-row">
+          <span>Tâche · 3 s</span>
+          <div class="timeline-track"><span class="timeline-track__task"></span></div>
+          <strong>{{ task().elapsed }} ms</strong>
+        </div>
+      </div>
+
+      <p class="task-note">La tâche a été résolue à {{ task().elapsed }} ms depuis le début commun de la navigation.</p>
+    </article>
+  `,
+  imports: [],
+})
+export class TaskDetailDemo {
+  readonly task = input.required<NestedTask>();
 }
 
 @Component({

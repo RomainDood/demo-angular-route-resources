@@ -15,20 +15,44 @@ import {
   NotFoundPage,
   NonBlockingDemo,
   ParallelDemo,
+  ProjectDetailDemo,
   ReloadDemo,
   ResourcesGuide,
+  TaskDetailDemo,
 } from './demo-pages';
 import {
   loadActivity,
   loadItem,
   loadMetrics,
+  loadProject,
   loadReport,
   loadSummary,
+  loadTask,
+  NestedRouteTrace,
 } from './demo-data';
 
 type ResourceRoute = Route & {
   resources?: (ctx: ResourceContext) => ResourceResult;
 };
+
+const nestedTaskRoutes: ResourceRoute[] = [
+  {
+    path: 'task/:taskId',
+    component: TaskDetailDemo,
+    resources: (ctx) => {
+      const trace = inject(NestedRouteTrace);
+      const startedAt = trace.start();
+
+      return {
+        task: resource({
+          params: () => ctx.params()['taskId'],
+          loader: ({ params, abortSignal }) =>
+            loadTask(params, startedAt, abortSignal),
+        }),
+      };
+    },
+  },
+];
 
 const resourceRoutes: ResourceRoute[] = [
   {
@@ -106,6 +130,24 @@ const resourceRoutes: ResourceRoute[] = [
         }),
       };
     },
+  },
+  {
+    path: 'project/:projectId',
+    component: ProjectDetailDemo,
+    providers: [NestedRouteTrace],
+    resources: (ctx) => {
+      const trace = inject(NestedRouteTrace);
+      const startedAt = trace.start();
+
+      return {
+        project: resource({
+          params: () => ctx.params()['projectId'],
+          loader: ({ params, abortSignal }) =>
+            loadProject(params, startedAt, abortSignal),
+        }),
+      };
+    },
+    children: nestedTaskRoutes,
   },
   {
     path: 'resources',

@@ -1,3 +1,5 @@
+import { Injectable } from '@angular/core';
+
 export interface DemoItem {
   id: string;
   category: string;
@@ -20,6 +22,30 @@ export interface DemoMetrics {
 export interface ParallelResult {
   duration: number;
   startedAt: number;
+}
+
+export interface NestedProject {
+  description: string;
+  elapsed: number;
+  id: string;
+  name: string;
+}
+
+export interface NestedTask {
+  elapsed: number;
+  id: string;
+  status: string;
+  title: string;
+}
+
+@Injectable()
+export class NestedRouteTrace {
+  private startedAt = 0;
+
+  start(): number {
+    this.startedAt ||= performance.now();
+    return this.startedAt;
+  }
 }
 
 const items: Record<string, DemoItem> = {
@@ -116,4 +142,34 @@ export async function loadActivity(
 ): Promise<ParallelResult> {
   await wait(1400, abortSignal);
   return { duration: Math.round(performance.now() - startedAt), startedAt };
+}
+
+export async function loadProject(
+  id: string,
+  startedAt: number,
+  abortSignal: AbortSignal,
+): Promise<NestedProject> {
+  await wait(2000, abortSignal);
+
+  return {
+    description: 'Un projet chargé par la route parente.',
+    elapsed: Math.round(performance.now() - startedAt),
+    id,
+    name: 'Refonte du tableau de bord',
+  };
+}
+
+export async function loadTask(
+  id: string,
+  startedAt: number,
+  abortSignal: AbortSignal,
+): Promise<NestedTask> {
+  await wait(3000, abortSignal);
+
+  return {
+    elapsed: Math.round(performance.now() - startedAt),
+    id,
+    status: 'En cours',
+    title: 'Présenter les Router Resources',
+  };
 }
